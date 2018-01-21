@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js",
+    "client": "node .load client.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,7 +19,9 @@
   },
   "homepage": "https://github.com/coldshower/node-blockchain#readme",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "nodemon": "^1.14.11"
