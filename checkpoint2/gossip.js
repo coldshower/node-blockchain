@@ -32,7 +32,7 @@ setInterval(() => {
 }, 8000);
 
 setInterval(() => {
-  console.log(STATE);
+  renderState();
 }, 3000);
 
 
@@ -43,4 +43,12 @@ app.listen(OWN_PORT, () => {
 
 function pickRandomMovie() {
   return MOVIES[Math.round(Math.random() * MOVIES.length)];
+}
+
+function renderState() {
+  console.log(chalk.blue('----------------------------------'));
+  for (let key in STATE) {
+    console.log(key + '\'s favorite movie is ' + chalk.yellow(STATE[key].favoriteMovie));
+  }
+  console.log(chalk.blue('----------------------------------'));
 }
