@@ -2,6 +2,8 @@ const fs = require('fs');
 const express = require('express');
 const request = require('request-promise');
 const chalk = require('chalk');
+const bodyParser = require('body-parser');
+const Promise = require('bluebird');
 
 const MOVIES = fs.readFileSync('./movies.txt', 'utf-8').split(/\r?\n/);
 
@@ -18,8 +20,16 @@ const STATE = {
   }
 };
 
-app.post('/gossip', (req, res) => {
+if (PEER_PORT) {
+  STATE[PEER_PORT] = null;
+}
 
+app.use(bodyParser.json());
+
+app.post('/gossip', (req, res) => {
+  const theirState = req.body.state;
+  updateState(theirState);
+  res.json({ state: STATE });
 });
 
 setInterval(() => {
@@ -29,11 +39,12 @@ setInterval(() => {
   STATE[OWN_PORT].favoriteMovie = newFavorite;
   STATE[OWN_PORT].version += 1;
   console.log('My new favorite movie is ' + chalk.green(newFavorite));
-}, 8000);
+}, 13000);
 
 setInterval(() => {
-  renderState();
-}, 3000);
+  gossipWithAll()
+  .then(renderState)
+}, 5000);
 
 
 app.listen(OWN_PORT, () => {
@@ -48,7 +59,44 @@ function pickRandomMovie() {
 function renderState() {
   console.log(chalk.blue('----------------------------------'));
   for (let key in STATE) {
-    console.log(key + '\'s favorite movie is ' + chalk.yellow(STATE[key].favoriteMovie));
+    if (STATE[key]) {
+      console.log(key + '\'s favorite movie is ' + chalk.yellow(STATE[key].favoriteMovie));
+    }
   }
   console.log(chalk.blue('----------------------------------'));
+}
+
+function gossipWithAll() {
+  const peerPorts = Object.keys(STATE).filter(port => port !== OWN_PORT);
+
+  return Promise.map(peerPorts, (peerPort) => {
+    console.log('Gossiping with ' + peerPort);
+    return request({
+      uri: 'http://localhost:' + peerPort + '/gossip',
+      method: 'POST',
+      body: {
+        state: STATE
+      },
+      json: true
+    })
+    .then(result => {
+      updateState(result.state);
+    })
+    .catch(error => {
+      console.log('Removing ' + peerPort + ' from clique.');
+      delete STATE[peerPort];
+    });
+  });
+}
+
+function updateState(newState) {
+  for (let port in newState) {
+    if (!STATE[port]) {
+      STATE[port] = newState[port];
+    } else {
+      if (newState[port] && newState[port].version > STATE[port].version) {
+        STATE[port] = newState[port];
+      }
+    }
+  }
 }

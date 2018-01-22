@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/coldshower/node-blockchain#readme",
   "dependencies": {
+    "bluebird": "^3.5.1",
+    "chalk": "^2.3.0",
     "express": "^4.16.2",
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
