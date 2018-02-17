@@ -31,8 +31,5 @@ function getRandomString() {
 
 function isEnoughZeroes(message, nonce) {
   const digest = hash(message + nonce);
-  if (digest.slice(0, NUM_ZEROES) === zeroString) {
-    return true;
-  }
-  return false;
+  return digest.slice(0, NUM_ZEROES) === zeroString;
 }
