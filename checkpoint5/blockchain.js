@@ -13,7 +13,7 @@ BlockChain.prototype.addGenesisBlock = function (message) {
 
 BlockChain.prototype.addToChain = function (message) {
   const prevBlock = this.blocks[this.blocks.length - 1];
-  const newBlock = new Block(prevBlock, message, this.options);
+  const newBlock = new Block(prevBlock.hash, message, this.options);
 
   this.blocks.push(newBlock);
 };
