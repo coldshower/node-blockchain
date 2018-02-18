@@ -46,7 +46,7 @@ function getRandomString() {
 function isEnoughZeros(digest, difficulty) {
   let zeroString = '';
   for (let i = 0; i < difficulty; i++) {
-    zeroString += 1;
+    zeroString += 0;
   }
 
   return digest.slice(0, difficulty) === zeroString;
@@ -55,3 +55,10 @@ function isEnoughZeros(digest, difficulty) {
 function hash(raw) {
   return crypto.createHash('md5').update(raw).digest('hex');
 }
+
+var blockchain1 = new BlockChain();
+blockchain1.addGenesisBlock('first');
+setInterval(function () {
+  blockchain1.addToChain(crypto.randomBytes(5).toString('hex'));
+  console.log(blockchain1.blocks[blockchain1.blocks.length - 1]);
+}, 5000);
